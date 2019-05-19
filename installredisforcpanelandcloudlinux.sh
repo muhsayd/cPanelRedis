@@ -5,11 +5,12 @@ rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-"${OSver}".rpm
 rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-"${OSver}".noarch.rpm
 yum -y install redis --enablerepo=remi --disableplugin=priorities
 
-if { ${OSver} -eq 6 }
+if [[ "${OSver}" -eq 6 ]]
 then
 	chkconfig redis on
 	service redis start
-elif { ${OSver} -eq 7 }
+elif [[ "${OSver}" -eq 7 ]]
+then
 	systemctl enable redis
 	systemctl start redis
 fi
@@ -57,9 +58,11 @@ installRemiRepo "${OSver}"
 addPortsToCSF
 for phpver in $(ls -1 /opt/alt/ |egrep 'php[0-9]{2}' | sed -r 's@php([0-9]{2})/@\1@g') ; 
 do 
-	compileRedisCP ${phpver}
 	compileRedisCL ${phpver}
-	
+done
+for phpver in $(ls -1 /opt/cpanel/ | grep ea-php | sed -r 's/ea-php([0-9]{2}).*/\1/g') ; 
+do
+        compileRedisCP ${phpver}                                                                                                                                               
 done
 
 /scripts/restartsrv_httpd
